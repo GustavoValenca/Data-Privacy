@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import json
 import os
 from collections import Counter
+import pandas as pd
 
 
 def anonymize_age(data, level):
@@ -33,13 +34,16 @@ def anonymize_age(data, level):
 def generate_json_age(data, output_path):
     json_memory = {}
 
-    data_length = len(data)
+    helper_list = pd.Series(range(1, 101), dtype='float64')
+    print(data.dtype)
+    
     for level in range(4):
         json_memory[f'nível {level}'] = {}
-        data_level = anonymize_age(data, level)
-        for i in range(data_length):
+
+        data_level = anonymize_age(helper_list, level)
+        for i in range(100):
         # writing data by checking if register has 'item' method
-            json_memory[f'nível {level}'][str(i)] = data_level[i].item() if hasattr(data_level[i], "item") else data_level[i]
+            json_memory[f'nível {level}'][str(i)] = data_level[i]
 
     with open(os.path.join(output_path, f"anonymized_age.json"), "w", encoding="utf-8") as f:
         json.dump(json_memory, f, ensure_ascii=False, indent=2)
