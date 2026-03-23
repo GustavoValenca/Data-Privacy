@@ -37,9 +37,10 @@ Onde:
 * `main.py`: Script principal que inicializa o menu interativo, solicita os níveis de publicação ($n_i$ e $n_d$), percorre o dataset substituindo os valores pela hierarquia e salva os arquivos resultantes.
 * `anonymize_age.py`: Módulo responsável pelas funções de mapeamento e generalização do atributo `idadeCaso`, além da geração dos JSONs de de/para e plotagem dos histogramas das idades.
 * `anonymize_birthdate.py`: Módulo responsável pelas lógicas de formatação do atributo `dataNascimento`, criação dos dicionários JSON e geração dos gráficos de histograma por nível.
-* `/Generated Datasets/`: Diretório onde os datasets de publicação ($DT\_n_i\_n_d$) gerados a cada iteração são armazenados, contendo o mesmo esquema e número de registros do dataset original.
+* `/Generated Datasets/`: Diretório onde os datasets de publicação (DT\_ni\_nd) gerados a cada iteração são armazenados, contendo o mesmo esquema e número de registros do dataset original.
 * `/Generated JSONs/`: Diretório onde os arquivos `.json` de mapeamento das hierarquias ficam salvos.
 * `/Generated Plots/`: Diretório de saída dos histogramas gerados para cada nível escolhido.
+* `/Generated Precisions/`: Diretório contendo os resultados da métrica precision para os níveis escolhidos.
 
 ## Como Executar
 
