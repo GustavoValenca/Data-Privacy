@@ -40,6 +40,7 @@ def static_menu():
     print('-' * 20)
     print('Para sair do programa, digite -1 em ambos os casos.')
 
+# just to manage attributes' hierarchies
 class SIAttribute:
     def __init__(self, name, maximum_hierarchy):
         self.name = name
