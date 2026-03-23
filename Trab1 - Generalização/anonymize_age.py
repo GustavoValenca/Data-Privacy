@@ -53,6 +53,7 @@ def generate_histogram_age(data, level, output_path): # data must contain values
         plt.ylabel("Contagem de registros")
         plt.tight_layout()
         plt.savefig(os.path.join(output_path, f"age_histogram_level_{level}.png"))
+        plt.show()
 
         return
     
