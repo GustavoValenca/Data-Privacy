@@ -1,4 +1,3 @@
 *.csv
 *.pyc
 settings.json
-*.json
