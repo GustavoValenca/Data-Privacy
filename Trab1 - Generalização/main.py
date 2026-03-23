@@ -16,9 +16,16 @@ df = pd.read_csv('Covid1.csv', sep=';')
 
 idadeCaso_raw = df.idadeCaso
 dataNascimento_raw = df.dataNascimento
+racaCor_raw = df.racaCor
+
+# removing strange values (0, 100+, and nan) for age
+df_clean = df[df['idadeCaso'].between(1, 100)]
+df_clean = df_clean.reset_index(drop=True)
+
+idadeCaso_clean = df_clean.idadeCaso
 
 # json for anonymized attributes
-generate_json_age(idadeCaso_raw, './Generated JSONs')
+generate_json_age(idadeCaso_clean, './Generated JSONs')
 gera_json_final(dataNascimento_raw, './Generated JSONs')
 
 def static_menu():
@@ -56,7 +63,7 @@ def calculate_dataset_precision(data_length, manager):
     return precision
 
 while True:
-    df_copy = df.copy()
+    df_copy = df_clean.copy()
 
     # user's input
     static_menu()
@@ -87,7 +94,8 @@ while True:
     print(f'A precisão do seu dataset é {dataset_precision}')
 
     # modifying dataset
-    new_age = anonymize_age(idadeCaso_raw, ni)
+    
+    new_age = anonymize_age(idadeCaso_clean, ni)
 
     map_function = [map_data_nascimento_nivel_0,
                     map_data_nascimento_nivel_1,
@@ -98,12 +106,9 @@ while True:
     df_copy['idadeCaso'] = new_age
     df_copy['dataNascimento'] = new_birth_date
 
-
+    # generate plots
     gera_histograma(new_birth_date, nd, './Generated Plots/')
-
-    age_for_hist = idadeCaso_raw[(idadeCaso_raw >= 1) & (idadeCaso_raw <= 100)]
-    result_for_hist = anonymize_age(age_for_hist, ni)
-    generate_histogram_age(result_for_hist, ni, './Generated Plots')
+    generate_histogram_age(new_age, ni, './Generated Plots')
 
     print('Salvando Dataset...')
 
