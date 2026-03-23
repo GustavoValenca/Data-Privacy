@@ -10,6 +10,7 @@ print("Inicializando o programa...")
 os.makedirs('./Generated Datasets/', exist_ok=True)
 os.makedirs('./Generated JSONs/', exist_ok=True)
 os.makedirs('./Generated Plots/', exist_ok=True)
+os.makedirs('./Generated Precisions/', exist_ok=True)
 
 
 df = pd.read_csv('Covid1.csv', sep=';')
@@ -23,10 +24,11 @@ df_clean = df[df['idadeCaso'].between(1, 100)]
 df_clean = df_clean.reset_index(drop=True)
 
 idadeCaso_clean = df_clean.idadeCaso
+dataNascimento_clean = df_clean.dataNascimento
 
 # json for anonymized attributes
 generate_json_age(idadeCaso_clean, './Generated JSONs')
-gera_json_final(dataNascimento_raw, './Generated JSONs')
+gera_json_final(dataNascimento_clean, './Generated JSONs')
 
 def static_menu():
     print('-=' * 20 + '-')
@@ -81,6 +83,14 @@ while True:
         print('Tente novamente.')
         time.sleep(1)
         continue
+    elif ni > 3 or ni < -1:
+        print("O nível para o atributo idade é inexistente.")
+        time.sleep(1)
+        continue
+    elif nd > 2 or nd < -1:
+        print("O nível para o atributo data nascimento é inexistente.")
+        time.sleep(1)
+        continue
     print(f'Seus níveis escolhidos foram {ni} para idade e {nd} para nascimento.')
 
     manager.attributes['idadeCaso'].current_hierarchy = ni
@@ -90,8 +100,12 @@ while True:
     data_length = len(df_copy)
     dataset_precision = calculate_dataset_precision(data_length, manager)
 
+    json_precision = {"precision": round(dataset_precision, 4)}
+    with open(os.path.join('./Generated Precisions', f"Precision_{ni}_{nd}.json"), "w", encoding="utf-8") as f:
+        json.dump(json_precision, f, ensure_ascii=False, indent=2)
+
     print('-' * 20)
-    print(f'A precisão do seu dataset é {dataset_precision}')
+    print(f'A precisão do seu dataset é { round(dataset_precision, 4)}')
 
     # modifying dataset
     
@@ -100,7 +114,7 @@ while True:
     map_function = [map_data_nascimento_nivel_0,
                     map_data_nascimento_nivel_1,
                     map_data_nascimento_nivel_2][nd]
-    new_birth_date = dataNascimento_raw.apply(map_function)
+    new_birth_date = dataNascimento_clean.apply(map_function)
 
 
     df_copy['idadeCaso'] = new_age
