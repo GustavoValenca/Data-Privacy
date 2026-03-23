@@ -1,4 +1,5 @@
 import json
+import os
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -41,17 +42,17 @@ def gera_json_nivel(data_nascimento_original, nivel):
 
     return map_json
 
-def gera_json_final(data_nascimento):
+def gera_json_final(data_nascimento, output_path):
     json_final = dict()
     for i in range(3):
         json_final[f"nivel {i}"] = gera_json_nivel(data_nascimento, nivel=i)
 
-    with open("anonymized_birthdate.json", "w") as file:
+    with open(os.path.join(output_path, f"anonymized_birthdate.json"), "w") as file:
         json.dump(json_final, file, indent=4)
 
     return json_final
 
-def gera_histograma(coluna_modificada, nivel):
+def gera_histograma(coluna_modificada, nivel, output_path):
     """
     Função de geração do histograma de acordo com o nível de generalização aplicado na coluna de data nascimento.
     """
@@ -82,7 +83,7 @@ def gera_histograma(coluna_modificada, nivel):
     plt.title(f"Histograma do atributo data nascimento\npara nível de generalização {nivel}")
     plt.xlabel("Data de nascimento")
     plt.ylabel("Contagem de registros")
-    plt.savefig("datebirth_histogram.png")
+    plt.savefig(os.path.join(output_path, f"datebirth_histogram_level_{nivel}.png"))
     plt.show()
 
 

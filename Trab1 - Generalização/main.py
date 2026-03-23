@@ -1,54 +1,110 @@
 import pandas as pd
-import numpy as np
-import random
-import json
+import time
 import os
 
-print(os.listdir('.'))
+from anonymize_birthdate import *
+from anonymize_age import *
+
+print("Inicializando o programa...")
+
+os.makedirs('./Generated Datasets/', exist_ok=True)
+os.makedirs('./Generated JSONs/', exist_ok=True)
+os.makedirs('./Generated Plots/', exist_ok=True)
+
 
 df = pd.read_csv('Covid1.csv', sep=';')
 
 idadeCaso_raw = df.idadeCaso
+dataNascimento_raw = df.dataNascimento
 
-def anonymize_age(data, level):
-    if level == 0:
-        return data
-    elif level == 1:
-        classes = {}
-        for i in range(1, 101, 5):
-            class_name = f'[{i}-{i + 5 - 1}]'
-            classes[class_name] = (i, i + 5 - 1)
+# json for anonymized attributes
+generate_json_age(idadeCaso_raw, './Generated JSONs')
+gera_json_final(dataNascimento_raw, './Generated JSONs')
 
-    elif level == 2:
-        classes = {'Criança': (1, 10), 'Adolescente': (11, 17), 'Adulto Jovem': (18, 35),
-               'Adulto': (36, 59), 'Idoso': (60, 100)}
+def static_menu():
+    print('-=' * 20 + '-')
+    print('Bem vindo.')
+    print('Escolha um nível de anonimização para idade e para nascimento.')
+    print('-' * 20)
+    print('Idade: 0 a 3')
+    print('Nascimento: 0 a 2')
+    print('-' * 20)
+    print('Para sair do programa, digite -1 em ambos os casos.')
 
-    elif level == 3:
-        classes = {'[1-100]': (1, 100)}
+class SIAttribute:
+    def __init__(self, name, maximum_hierarchy):
+        self.name = name
+        self.maximum_hierarchy = maximum_hierarchy
+        self.current_hierarchy = 0
 
-    choices = []
-    conditions = []
-    for key, values in classes.items():
-        choices.append(key)
-        conditions.append((data >= values[0]) & (data <= values[1]))
+class ManagerSIAttributes:
+    def __init__(self):
+        self.attributes = {}
+    def add(self, name, maximum_hierarchy):
+        self.attributes[name] = SIAttribute(name, maximum_hierarchy)
 
-    result = np.select(conditions, choices, default=None)
-    return result
+manager = ManagerSIAttributes()
+manager.add('idadeCaso', 3)
+manager.add('dataNascimento', 2)
 
-def generate_json_age(data):
-    json = {}
+def calculate_dataset_precision(data_length, manager):
+    total_sum = 0
+    for _, attribute in manager.attributes.items():
+        current_sum = data_length * (attribute.current_hierarchy / attribute.maximum_hierarchy)
+        total_sum += current_sum
+    precision = 1 - total_sum / (data_length * len(manager.attributes))
+    return precision
 
-    data_length = len(data)
-    for level in range(4):
-        json[f'nível {level}'] = {}
-        data_level = anonymize_age(data, level)
-        for i in range(data_length):
-        # writing data by checking if register has 'item' method
-            json[f'nível {level}'][str(i)] = data_level[i].item() if hasattr(data_level[i], "item") else data_level[i]
+while True:
+    df_copy = df.copy()
 
-    return json
+    # user's input
+    static_menu()
+    try:
+        ni = int(input('Nível de anonimização para idade: '))
+        nd = int(input('Nível de anonimização para nascimento: '))
+    except:
+        print('Entrada em formato errado. Tente novamente.')
+        time.sleep(1)
+        continue
 
-json_memory = generate_json_age(idadeCaso_raw)
+    if ni == -1 and nd == -1:
+        break
+    elif ni == -1 or nd == -1:
+        print('Tente novamente.')
+        time.sleep(1)
+        continue
+    print(f'Seus níveis escolhidos foram {ni} para idade e {nd} para nascimento.')
 
-with open("anonymized_age.json", "w", encoding="utf-8") as f:
-    json.dump(json_memory, f, ensure_ascii=False, indent=2)
+    manager.attributes['idadeCaso'].current_hierarchy = ni
+    manager.attributes['dataNascimento'].current_hierarchy = nd
+
+    # dataset precision
+    data_length = len(df_copy)
+    dataset_precision = calculate_dataset_precision(data_length, manager)
+
+    print('-' * 20)
+    print(f'A precisão do seu dataset é {dataset_precision}')
+
+    # modifying dataset
+    new_age = anonymize_age(idadeCaso_raw, ni)
+
+    map_function = [map_data_nascimento_nivel_0,
+                    map_data_nascimento_nivel_1,
+                    map_data_nascimento_nivel_2][nd]
+    new_birth_date = dataNascimento_raw.apply(map_function)
+
+
+    df_copy['idadeCaso'] = new_age
+    df_copy['dataNascimento'] = new_birth_date
+
+
+    gera_histograma(new_birth_date, nd, './Generated Plots/')
+
+    age_for_hist = idadeCaso_raw[(idadeCaso_raw >= 1) & (idadeCaso_raw <= 100)]
+    result_for_hist = anonymize_age(age_for_hist, ni)
+    generate_histogram_age(result_for_hist, ni, './Generated Plots')
+
+    print('Salvando Dataset...')
+
+    df_copy.to_csv(f'./Generated Datasets/DT_{ni}_{nd}.csv', index=False, sep=';')
