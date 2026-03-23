@@ -11,7 +11,7 @@ O trabalho consiste em implementar métodos de anonimização no dataset `Covid1
 
 O projeto implementa hierarquias de generalização específicas para dois atributos:
 
-* Atributo `idadeCaso` (4 níveis de hierarquia):**
+* Atributo `idadeCaso` (4 níveis de hierarquia):
     * **Nível 0:** Dado original.
     * **Nível 1:** Intervalos de 5 valores (ex: 1 a 5, 6 a 10, ...).
     * **Nível 2:** Ciclos de vida (Criança: 1-10, Adolescente: 11-17, Adulto Jovem: 18-35, Adulto: 36-59, Idoso: 60+).
