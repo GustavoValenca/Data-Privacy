@@ -27,6 +27,11 @@ def map_data_nascimento_nivel_2(x):
     if type(x) != str: return x
     return x.split("-")[0]
 
+def map_data_nascimento(x, nivel):
+    if nivel == 0: return x
+    elif nivel == 1: return map_data_nascimento_nivel_1(x)
+    elif nivel == 2: return map_data_nascimento_nivel_2(x)
+
 def gera_json_nivel(data_nascimento_original, nivel):
     """
     Função que gera os json com mapeamento dos valores originais para os generalizados de acordo com o nível fornecido
