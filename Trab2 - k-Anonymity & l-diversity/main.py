@@ -166,17 +166,6 @@ if mostrar_grupos_k_l:
         grupo_generalizado, niveis = utils_tarefa2.generalizacao_minima_grupo(grupo)
         print(grupo)
         print(niveis)
+        print(grupo_generalizado)
         print()
 
-    for i in dataframe_agrupado_k_l.grupo.unique():
-        grupo = dataframe_agrupado_k_l[dataframe_agrupado_k_l.grupo == i].copy()
-        grupo_generalizado, niveis = utils_tarefa2.generalizacao_minima_grupo(grupo)
-        if niveis is None or niveis["groupSize"] < k or grupo_generalizado.racaCor.nunique() < l:
-            print("Grupo",i,"problemático")
-            impossibilidade_generalizacao = (niveis is None)
-            grupo_pequeno = (niveis["groupSize"] < k)
-            sem_l_diversidade = (grupo_generalizado.racaCor.nunique() < l)
-            if impossibilidade_generalizacao: print("- Grupo não é possível generalizar")
-            if grupo_pequeno: print("- Grupo pequeno")
-            if sem_l_diversidade: print("- Grupo sem l-diversidade")
-            print(grupo)
