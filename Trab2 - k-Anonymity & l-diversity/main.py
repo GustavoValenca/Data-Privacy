@@ -60,7 +60,6 @@ if mostrar_grupos_k_l:
         df_copy = df.copy()
         df_copy = df_copy[["idadeCaso", "dataNascimento", "racaCor"]]
 
-
         possible_k = [1, 2, 4, 8, 16]
         possible_l = [1, 2, 3, 4]
 
