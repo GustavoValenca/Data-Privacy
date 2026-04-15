@@ -132,9 +132,6 @@ def k_l_anonymity_greedy_month(
     return df
 
 
-amostra_pequena = df.sample(100000, random_state = 23)
-amostra_pequena = amostra_pequena.reset_index(drop=True)
-
 # just to manage attributes' hierarchies
 class SIAttribute:
     def __init__(self, name, maximum_hierarchy):
@@ -179,9 +176,11 @@ mostrar_grupos_k_l = True
 if mostrar_grupos_k_l:
     while True:
         df_copy = df.copy()
+        df_copy = df_copy[["idadeCaso", "dataNascimento", "racaCor"]]  
 
-        possible_k = [2, 4, 8, 16]
-        possible_l = [2, 3, 4]
+
+        possible_k = [1, 2, 4, 8, 16]
+        possible_l = [1, 2, 3, 4]
 
         static_menu()
 
@@ -216,10 +215,10 @@ if mostrar_grupos_k_l:
         print("Rodando execução do K-anonimato integrado com L-diversidade")
         # k = 1
         # l = 1
-        dataframe_agrupado_k_l = k_l_anonymity_greedy_month(amostra_pequena, col_data_nasc = "dataNascimento", col_sensivel = "racaCor",
+        dataframe_agrupado_k_l = k_l_anonymity_greedy_month(df_copy, col_data_nasc = "dataNascimento", col_sensivel = "racaCor",
                                                     k = k, l = l)
         tamanhos_grupos_k_l = dataframe_agrupado_k_l.groupby("grupo")["idadeCaso"].count().rename({"idadeCaso" : "count"})
-        print(amostra_pequena.shape, dataframe_agrupado_k_l.shape)
+        print(df_copy.shape, dataframe_agrupado_k_l.shape)
         print(tamanhos_grupos_k_l.describe())
 
         data_length = len(dataframe_agrupado_k_l)
@@ -228,29 +227,32 @@ if mostrar_grupos_k_l:
         manager.add('idadeCaso', 3)
         manager.add('dataNascimento', 2)
 
+        print("Aguarde, seu dataset está sendo preparado...")  
+        time.sleep(1)
         df_copy['idadeCaso'] = df_copy['idadeCaso'].astype(str)
 
-        for i in dataframe_agrupado_k_l.grupo.unique():
-            grupo = dataframe_agrupado_k_l[dataframe_agrupado_k_l.grupo == i].copy()
-            grupo_generalizado, niveis = utils_tarefa2.generalizacao_minima_grupo(grupo)
+        if k != 1 and l != 1:
+            for i in dataframe_agrupado_k_l.grupo.unique():
+                grupo = dataframe_agrupado_k_l[dataframe_agrupado_k_l.grupo == i].copy()
+                grupo_generalizado, niveis = utils_tarefa2.generalizacao_minima_grupo(grupo)
 
-            # print(niveis)
-            indices = niveis['groupIndexes']
-            # print(niveis)
-            # print(grupo_generalizado)
+                # print(niveis)
+                indices = niveis['groupIndexes']
+                # print(niveis)
+                # print(grupo_generalizado)
 
-            for j in indices:
-                # print(j)
-                manager.attributes['idadeCaso'].hierarchy_list[j] = niveis['idadeCaso']
-                manager.attributes['dataNascimento'].hierarchy_list[j] = niveis['dataNascimento']
+                for j in indices:
+                    # print(j)
+                    manager.attributes['idadeCaso'].hierarchy_list[j] = niveis['idadeCaso']
+                    manager.attributes['dataNascimento'].hierarchy_list[j] = niveis['dataNascimento']
 
-                valor_idade = grupo_generalizado.loc[j, 'idadeCaso']
-                valor_nascimento = grupo_generalizado.loc[j, 'dataNascimento']
+                    valor_idade = grupo_generalizado.loc[j, 'idadeCaso']
+                    valor_nascimento = grupo_generalizado.loc[j, 'dataNascimento']
 
-                df_copy.loc[j, 'idadeCaso'] = str(valor_idade)
-                df_copy.loc[j, 'dataNascimento'] = str(valor_nascimento)
-            
-        df_copy = df_copy[["idadeCaso", "dataNascimento", "racaCor"]]  
+                    df_copy.loc[j, 'idadeCaso'] = str(valor_idade)
+                    df_copy.loc[j, 'dataNascimento'] = str(valor_nascimento)
+
+         
         print(f'Tamanho do dataset: {manager.data_length}')
         dataset_precision = calculate_dataset_precision(manager)
         print(f'A precisão do seu dataset é { round(dataset_precision, 4)}')
