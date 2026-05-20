@@ -9,14 +9,10 @@ def laplace_mechanism(
 
     scale = sensibility / epsilon
 
-    u = np.random.uniform(
-        low=-0.5,
-        high=0.5,
+    noise = np.random.laplace(
+        loc=0,
+        scale=scale,
         size=len(data)
-    )
-
-    noise = -scale * np.sign(u) * np.log(
-        1 - 2 * np.abs(u)
     )
 
     noised_data = data + noise

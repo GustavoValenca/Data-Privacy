@@ -28,6 +28,7 @@ original_series = pd.Series(votes_by_candidate).sort_values(ascending = False)
 tabela_estatisticas = original_series.describe()
 tabela_estatisticas["sum"] = original_series.sum()
 
+print("Tabela com estatísticas do histograma real:")
 print(tabela_estatisticas.round(2))
 
 candidato_mais_votado = original_series.index[0]
@@ -36,10 +37,11 @@ qnt_votos_mais_votado = original_series.iat[0]
 seg_candidato_mais_votado = original_series.index[1]
 gap_entre_top2_candidatos = qnt_votos_mais_votado - original_series.iat[1]
 
-print(candidato_mais_votado)
-print(qnt_votos_mais_votado)
-print(seg_candidato_mais_votado)
-print(gap_entre_top2_candidatos)
+print()
+print("Candidato mais votado:", candidato_mais_votado)
+print("Contagem de votos do candidato mais votado:", qnt_votos_mais_votado)
+print("Segundo candidato mais votado:", seg_candidato_mais_votado)
+print("Gap entre os dois candidatos mais votados:", gap_entre_top2_candidatos)
 
 
 dict_experiments = {}
