@@ -31,11 +31,11 @@ def estimate_counts(perturbed_series, domain, epsilon):
     lambda_j = counts / n
 
     phi_hat = (lambda_j - q) / (p - q)
-
     est_counts = phi_hat * n
 
     return est_counts
 
 def post_process(counts):
+    counts = counts.copy()
     counts[counts < 0] = 0
     return counts
