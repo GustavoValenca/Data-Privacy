@@ -22,7 +22,7 @@ df_fortaleza_1st_term_expanded_filtered = df_fortaleza_1st_term_expanded[['NR_ZO
 df_fortaleza_1st_term_expanded_filtered.to_csv('votacao_prefeito_CE_2024_fortal_1st_term_expanded_filtered.csv')
 
 if APPLY_SAMPLE:
-    df_fortaleza_1st_term_expanded_filtered = df_fortaleza_1st_term_expanded_filtered.sample(10000)
+    df_fortaleza_1st_term_expanded_filtered = df_fortaleza_1st_term_expanded_filtered.sample(100000)
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("!!!!!!!!! SAMPLE APLICADO, RETIRAR POSTERIORMENTE !!!!!!!!!")
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
