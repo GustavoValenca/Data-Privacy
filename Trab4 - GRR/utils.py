@@ -70,7 +70,7 @@ def generate_histogram(votes_by_candidate, save_path = None, zones = False, titl
     values = [item[1] for item in sorted_items]
 
     if zones:
-        names = list(map(lambda x: f"Seção {x}", names))
+        names = list(map(lambda x: f"Zona {x}", names))
 
     plt.figure(figsize=(16, 8))
 
