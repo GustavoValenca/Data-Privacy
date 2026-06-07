@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def get_mae(
     real_data: pd.Series,
     noised_data: pd.Series
@@ -205,27 +206,103 @@ def plot_winner_preservation_by_epsilon(results: dict, save_path = None):
 
 
 
-def plot_metric_by_epsilon(results: dict, metric = str, save_path = None, show = False):
+def _mean_and_ci(values, confidence=0.95):
     """
-    Plota o erro absoluto total em função de epsilon.
+    Retorna média e intervalo de confiança usando
+    aproximação normal.
     """
+
+    if isinstance(values, pd.DataFrame):
+        values = values.to_numpy().ravel()
+    elif isinstance(values, pd.Series):
+        values = values.to_numpy()
+
+    values = np.asarray(values, dtype=float).ravel()
+
+    n = len(values)
+    mean = np.mean(values)
+
+    if n <= 1:
+        return mean, mean, mean
+
+    std = np.std(values, ddof=1)
+    sem = std / np.sqrt(n)
+
+    z_values = {
+        0.90: 1.645,
+        0.95: 1.96,
+        0.99: 2.576,
+    }
+
+    z = z_values.get(confidence, 1.96)
+
+    margin = z * sem
+
+    return mean, mean - margin, mean + margin
+
+
+def plot_metric_by_epsilon(
+    results: dict,
+    metric: str,
+    save_path=None,
+    show=False,
+    confidence=0.95,
+):
     epsilons = sorted(results.keys())
-    metric_values = [results[eps][metric] for eps in epsilons]
+
+    means = []
+    lower_bounds = []
+    upper_bounds = []
+    has_ci = False
+
+    for eps in epsilons:
+        value = results[eps][metric]
+
+        if np.isscalar(value):
+            means.append(value)
+            lower_bounds.append(value)
+            upper_bounds.append(value)
+        else:
+            mean, lower, upper = _mean_and_ci(
+                value,
+                confidence=confidence,
+            )
+            means.append(mean)
+            lower_bounds.append(lower)
+            upper_bounds.append(upper)
+            has_ci = True
 
     plt.figure(figsize=(8, 5))
-    plt.plot(epsilons, metric_values, marker="o")
+
+    plt.plot(
+        epsilons,
+        means,
+        marker="o",
+        label="Mean"
+    )
+
+    if has_ci:
+        plt.fill_between(
+            epsilons,
+            lower_bounds,
+            upper_bounds,
+            alpha=0.2,
+            label=f"{int(confidence * 100)}% CI"
+        )
+        plt.legend()
 
     _configure_log_x_axis(epsilons)
-    _annotate_points(epsilons, metric_values)
+    _annotate_points(epsilons, means)
 
     plt.xlabel("ε (log scale)")
     plt.ylabel(metric)
     plt.title(f"{metric} vs ε")
 
     plt.tight_layout()
+
     if save_path is not None:
-        plt.savefig(save_path, dpi = 200)
-    
+        plt.savefig(save_path, dpi=200)
+
     if show:
         plt.show()
     else:

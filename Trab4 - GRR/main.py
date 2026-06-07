@@ -22,7 +22,7 @@ df_fortaleza_1st_term_expanded_filtered = df_fortaleza_1st_term_expanded[['NR_ZO
 df_fortaleza_1st_term_expanded_filtered.to_csv('votacao_prefeito_CE_2024_fortal_1st_term_expanded_filtered.csv')
 
 if APPLY_SAMPLE:
-    df_fortaleza_1st_term_expanded_filtered = df_fortaleza_1st_term_expanded_filtered.sample(100000)
+    df_fortaleza_1st_term_expanded_filtered = df_fortaleza_1st_term_expanded_filtered.sample(10000)
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("!!!!!!!!! SAMPLE APLICADO, RETIRAR POSTERIORMENTE !!!!!!!!!")
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -129,16 +129,20 @@ for epsilon in epsilon_list:
 
         'mae_list': postprocesssed_mae_list,
         'is_winner_preserved_list': postprocesssed_is_winner_preserved_list,
-        'precision_list': postprocesssed_precision_list
+        'precision_list': postprocesssed_precision_list,
+
+        'mae_list_no_postprocess': raw_mae_list,
+        'is_winner_preserved_list_no_postprocess': raw_is_winner_preserved_list,
+        'precision_list_no_postprocess': raw_precision_list
     }
 
 
 pd.DataFrame(dict_experimentos).to_csv('Trab4 - GRR/metricas/experimentos_grr.csv', index=False)
 
-plot_metric_by_epsilon(dict_experimentos, metric='mae_mean', save_path="Trab4 - GRR/graficos/postprocessed_mae_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='precision_mean', save_path="Trab4 - GRR/graficos/postprocessed_precision_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='winner_preserved_percentage', save_path="Trab4 - GRR/graficos/postprocessed_winner_preserved_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='mae_list', save_path="Trab4 - GRR/graficos/postprocessed_mae_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='precision_list', save_path="Trab4 - GRR/graficos/postprocessed_precision_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='is_winner_preserved_list', save_path="Trab4 - GRR/graficos/postprocessed_winner_preserved_metric.png")
 
-plot_metric_by_epsilon(dict_experimentos, metric='mae_mean_no_postprocess', save_path="Trab4 - GRR/graficos/raw_mae_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='precision_mean_no_postprocess', save_path="Trab4 - GRR/graficos/raw_precision_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='winner_preserved_percentage_no_postprocess', save_path="Trab4 - GRR/graficos/raw_winner_preserved_metric.png")    
+plot_metric_by_epsilon(dict_experimentos, metric='mae_list_no_postprocess', save_path="Trab4 - GRR/graficos/raw_mae_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='precision_list_no_postprocess', save_path="Trab4 - GRR/graficos/raw_precision_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='is_winner_preserved_list_no_postprocess', save_path="Trab4 - GRR/graficos/raw_winner_preserved_metric.png")    
