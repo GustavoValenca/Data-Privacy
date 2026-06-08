@@ -6,13 +6,11 @@ from metrics import *
 from utils import *
 from tqdm import tqdm
 
-try:
-    df = pd.read_csv('Trab3 - Laplace/votacao_prefeito_CE_2024.csv', encoding='cp1252', sep=';')
-except:
-    df = pd.read_csv('Data-Privacy/Trab3 - Laplace/votacao_prefeito_CE_2024.csv', encoding='cp1252', sep=';')
+
+df = pd.read_csv('../Trab3 - Laplace/votacao_prefeito_CE_2024.csv', encoding='cp1252', sep=';')
 
 
-APPLY_SAMPLE = True
+APPLY_SAMPLE = False
 
 df_fortaleza = df[df['NM_MUNICIPIO'] == 'FORTALEZA']
 df_fortaleza_1st_term = df_fortaleza[df_fortaleza['NR_TURNO'] == 1]
@@ -50,7 +48,7 @@ print("Contagem de votos do candidato mais votado:", qnt_votos_mais_votado)
 print("Segundo candidato mais votado:", seg_candidato_mais_votado)
 print("Gap entre os dois candidatos mais votados:", gap_entre_top2_candidatos)
 
-generate_histogram(real_candidate_counts, title = "Votos por candidato", save_path = "Trab4 - GRR/graficos/candidates_histogram.png")
+generate_histogram(real_candidate_counts, title = "Votos por candidato", save_path = "graficos/candidates_histogram.png")
 
 ###########################################################################################
 
@@ -63,7 +61,7 @@ print("### ANALYSIS BY ZONES ###")
 print("Top 10 zonas com mais votos")
 print(real_zone_counts.sort_values(ascending=False).head(10))
 
-generate_histogram(real_zone_counts, title = "Votos por zona eleitoral", zones = True, save_path = "Trab4 - GRR/graficos/zones_histogram.png")
+generate_histogram(real_zone_counts, title = "Votos por zona eleitoral", zones = True, save_path = "graficos/zones_histogram.png")
 
 ###########################################################################################
 
@@ -137,12 +135,12 @@ for epsilon in epsilon_list:
     }
 
 
-pd.DataFrame(dict_experimentos).to_csv('Trab4 - GRR/metricas/experimentos_grr.csv', index=False)
+pd.DataFrame(dict_experimentos).to_csv('metricas/experimentos_grr.csv', index=False)
 
-plot_metric_by_epsilon(dict_experimentos, metric='mae_list', save_path="Trab4 - GRR/graficos/postprocessed_mae_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='precision_list', save_path="Trab4 - GRR/graficos/postprocessed_precision_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='is_winner_preserved_list', save_path="Trab4 - GRR/graficos/postprocessed_winner_preserved_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='mae_list', save_path="graficos/postprocessed_mae_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='precision_list', save_path="graficos/postprocessed_precision_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='is_winner_preserved_list', save_path="graficos/postprocessed_winner_preserved_metric.png")
 
-plot_metric_by_epsilon(dict_experimentos, metric='mae_list_no_postprocess', save_path="Trab4 - GRR/graficos/raw_mae_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='precision_list_no_postprocess', save_path="Trab4 - GRR/graficos/raw_precision_metric.png")
-plot_metric_by_epsilon(dict_experimentos, metric='is_winner_preserved_list_no_postprocess', save_path="Trab4 - GRR/graficos/raw_winner_preserved_metric.png")    
+plot_metric_by_epsilon(dict_experimentos, metric='mae_list_no_postprocess', save_path="graficos/raw_mae_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='precision_list_no_postprocess', save_path="graficos/raw_precision_metric.png")
+plot_metric_by_epsilon(dict_experimentos, metric='is_winner_preserved_list_no_postprocess', save_path="graficos/raw_winner_preserved_metric.png")

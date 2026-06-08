@@ -1,39 +1,69 @@
 import numpy as np
+import pandas as pd
 
-def grr_perturb(value, domain, epsilon):
+def apply_grr(df, column, epsilon):
+    domain = np.array(df[column].unique())
+
     k = len(domain)
 
-    p = np.exp(epsilon) / (np.exp(epsilon) + k - 1)
-    q = 1 / (np.exp(epsilon) + k - 1)
+    exp_eps = np.exp(epsilon)
+    p = exp_eps / (exp_eps + k - 1)
 
-    if np.random.rand() < p:
-        return value
-    else:
-        other_values = [v for v in domain if v != value]
-        return np.random.choice(other_values)
-    
-def apply_grr(df, column, epsilon):
-    domain = df[column].unique().tolist()
+    value_to_idx = {v: i for i, v in enumerate(domain)}
 
-    perturbed = df[column].apply(lambda x: grr_perturb(x, domain, epsilon))
+    data_idx = df[column].map(value_to_idx).to_numpy()
+
+    n = len(data_idx)
+
+    keep = np.random.rand(n) < p
+
+    replacement = np.random.randint(0, k - 1, size=n)
+
+    replacement += (replacement >= data_idx)
+
+    perturbed_idx = np.where(
+        keep,
+        data_idx,
+        replacement
+    )
+
+    perturbed = domain[perturbed_idx]
 
     return perturbed, domain
 
-def estimate_counts(perturbed_series, domain, epsilon):
-    n = len(perturbed_series)
+
+def estimate_counts(perturbed, domain, epsilon):
+    n = len(perturbed)
     k = len(domain)
 
-    p = np.exp(epsilon) / (np.exp(epsilon) + k - 1)
-    q = 1 / (np.exp(epsilon) + k - 1)
+    exp_eps = np.exp(epsilon)
 
-    counts = perturbed_series.value_counts().reindex(domain, fill_value=0)
+    p = exp_eps / (exp_eps + k - 1)
+    q = 1 / (exp_eps + k - 1)
+
+    value_to_idx = {v: i for i, v in enumerate(domain)}
+
+    perturbed_idx = np.array(
+        [value_to_idx[v] for v in perturbed],
+        dtype=np.int32
+    )
+
+    counts = np.bincount(
+        perturbed_idx,
+        minlength=k
+    )
 
     lambda_j = counts / n
 
     phi_hat = (lambda_j - q) / (p - q)
+
     est_counts = phi_hat * n
 
-    return est_counts
+    return pd.Series(
+        est_counts,
+        index=domain
+    )
+
 
 def post_process(counts):
     counts = counts.copy()
